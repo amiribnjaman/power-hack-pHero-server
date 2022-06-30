@@ -9,15 +9,43 @@ app.use(cors())
 app.use(express.json())
 
 
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://powerUser:<password>@cluster0.kcxwz.mongodb.net/?retryWrites=true&w=majority";
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kcxwz.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
+
+(async () => {
+    try {
+        await client.connect();
+        const billCollection = client.db("power-hack-pHero-task").collection("bill");
+
+        app.post('/api/add-billing', async (req, res) => {
+            const data = req.body
+            const result = await billCollection.insertOne(data);
+            res.send(result)
+        })
+
+        app.get('/api/billing-list', async (req, res) => {
+            const query = req.query
+            const cursor = await billCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result)
+        })
+
+        app.get('/api/update-billing/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = ({ _id: ObjectId(id) })
+            const result = await billCollection.findOne(filter);
+            
+            res.send(result)
+        })
+
+
+
+
+    } finally {
+
+    }
+})().catch(console.dir);
 
 
 
