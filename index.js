@@ -33,6 +33,7 @@ const verifyJWT = (req, res, next) => {
     }
 }
 
+// Initial function
 (async () => {
     try {
         await client.connect();
@@ -75,7 +76,6 @@ const verifyJWT = (req, res, next) => {
             let result
             const query = {}
             const search = req.query
-            console.log(search)
             const page = parseInt(req.query.page)
             const cursor = await billCollection.find(query).sort({ _id: -1 });
             let count = await billCollection.countDocuments();
@@ -89,12 +89,10 @@ const verifyJWT = (req, res, next) => {
                 const value = await billCollection.find({}).toArray()
                 result = value.filter(v => v.name.toLowerCase().includes(search.search.toLowerCase()) || v.email.toLowerCase().includes(search.search.toLowerCase()))
             }
-
-
             res.send({ result, count })
         })
 
-        // Update a specific item 
+        // Update a specific item api
         app.put('/api/update-billing/:id', async (req, res) => {
             const id = req.params.id
             const data = req.body
@@ -108,7 +106,7 @@ const verifyJWT = (req, res, next) => {
             res.send(result)
         })
 
-        // Deleting a specific item by id
+        // Deleting a specific item by id api
         app.delete('/api/delete-billing/:id', verifyJWT, async (req, res) => {
             const id = req.params.id
             const filter = ({ _id: ObjectId(id) })
@@ -120,11 +118,6 @@ const verifyJWT = (req, res, next) => {
                 return res.send(status)
             }
         })
-
-
-
-
-
 
     } finally {
 
