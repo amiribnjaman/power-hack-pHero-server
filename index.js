@@ -28,17 +28,22 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
         // All billing list api
         app.get('/api/billing-list', async (req, res) => {
             const query = req.query
-            const cursor = await billCollection.find(query);
+            const cursor = await billCollection.find(query).sort({ _id: -1 });
             const result = await cursor.toArray()
             res.send(result)
         })
 
-        // Get specific item 
-        app.get('/api/update-billing/:id', async (req, res) => {
+        // Update a specific item 
+        app.put('/api/update-billing/:id', async (req, res) => {
             const id = req.params.id
+            const data = req.body
             const filter = ({ _id: ObjectId(id) })
-            const result = await billCollection.findOne(filter);
-            
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: data 
+            }
+            const result = await billCollection.updateOne(filter, updateDoc, options);
+
             res.send(result)
         })
 
@@ -67,5 +72,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`App listening on port ${port}`)
 })
