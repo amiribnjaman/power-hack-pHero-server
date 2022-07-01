@@ -18,12 +18,14 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
         await client.connect();
         const billCollection = client.db("power-hack-pHero-task").collection("bill");
 
+        // Add new billing api
         app.post('/api/add-billing', async (req, res) => {
             const data = req.body
             const result = await billCollection.insertOne(data);
             res.send(result)
         })
 
+        // All billing list api
         app.get('/api/billing-list', async (req, res) => {
             const query = req.query
             const cursor = await billCollection.find(query);
@@ -31,6 +33,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
             res.send(result)
         })
 
+        // Get specific item 
         app.get('/api/update-billing/:id', async (req, res) => {
             const id = req.params.id
             const filter = ({ _id: ObjectId(id) })
@@ -38,6 +41,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
             
             res.send(result)
         })
+
+        // Deleting a specific item by id
+        app.delete('/api/delete-billing/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = ({ _id: ObjectId(id) })
+            const result = await billCollection.deleteOne(filter);
+            res.send(result)
+        })
+
+
 
 
 
