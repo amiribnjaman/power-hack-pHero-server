@@ -9,6 +9,12 @@ const jwt = require('jsonwebtoken');
 app.use(cors())
 app.use(express.json())
 
+// Middleware for cors issue
+app.use((req, res, next) => {
+    res.header({"Access-Control-Allow-Origin": "*"});
+    next();
+  }) 
+
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kcxwz.mongodb.net/?retryWrites=true&w=majority`;
@@ -45,7 +51,7 @@ const verifyJWT = (req, res, next) => {
         app.post('/api/registration', async (req, res) => {
             const data = req.body
             const result = await userCollection.insertOne(data);
-            res.send({ result, token })
+            res.send(result)
         })
 
         // Login api
